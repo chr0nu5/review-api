@@ -52,6 +52,7 @@ class Review(models.Model):
     ip = models.CharField(max_length=15)
     company = models.ForeignKey(Company)
     reviewer = models.ForeignKey(Reviewer)
+    client = models.ForeignKey(Client)
     created_date = models.DateTimeField(auto_now_add=True, editable=False)
     modified_date = models.DateTimeField(auto_now=True, editable=False)
 

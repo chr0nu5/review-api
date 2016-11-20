@@ -20,7 +20,7 @@ class Client(User):
     modified_date = models.DateTimeField(auto_now=True, editable=False)
 
     def __unicode__(self):
-        return self.first_name
+        return self.username
 
     class Meta:
         verbose_name = "Client"
