@@ -1,3 +1,5 @@
+import re
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from oauth.models import Client
@@ -32,14 +34,20 @@ def reviewers(request):
                 return JsonResponse({"reviewers": reviewers})
             elif request.method == 'POST':
                 name = request.POST.get('name','')
-                if name:
-                    reviewer = Reviewer.objects.create(name=name, client=client)
-                    reviewer = {
-                        "id": reviewer.pk,
-                        "name": reviewer.name
-                    }
-                    return JsonResponse({'reviewer': reviewer})
-                return JsonResponse({'error': 'Missing name field'})
+                email = request.POST.get('email','')
+                if name and email:
+                    match = re.search(r'[\w.-]+@[\w.-]+.\w+', email)
+                    if match:
+                        reviewer = Reviewer.objects.create(name=name, email=email, client=client)
+                        reviewer = {
+                            "id": reviewer.pk,
+                            "name": reviewer.name,
+                            "email": reviewer.email,
+                        }
+                        return JsonResponse({'reviewer': reviewer})
+                    else:
+                        return JsonResponse({'error': 'You must provide a valid email'})
+                return JsonResponse({'error': 'You must provide a name and an email'})
             else:
                 return JsonResponse({'error': 'Http method not allowed'})
         return JsonResponse({"error": "A valid token is needed for this request."})
