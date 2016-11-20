@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'oauth'
+    'oauth',
+    'reviews'
 ]
 
 MIDDLEWARE = [
@@ -90,18 +91,6 @@ DATABASES = {
         'PORT': 5432,
     }
 }
-
-# if 'test' in sys.argv:
-#     DATABASES['default'] = {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'postgres_tests',
-#         'USER': 'postgres',
-#         'HOST': 'db',
-#         'PORT': 5432,
-#     }
-    #DEBUG = False # might accelerate a bit
-    #TEMPLATE_DEBUG = False
-    #call_command('syncdb', migrate=True)
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators

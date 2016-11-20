@@ -11,7 +11,7 @@ class ClientTestCase(TestCase):
     def test_client_null_token(self):
         """The user does not have a token"""
         client = Client.objects.get(username="john")
-        self.assertEqual(client.get_token(), None)
+        self.assertIsNone(client.get_token())
 
     def test_client_has_token(self):
         """The user have a token with len 36"""
@@ -24,4 +24,4 @@ class ClientTestCase(TestCase):
         client = Client.objects.get(username="john")
         client.generate_token()
         client.invalidate_token()
-        self.assertEqual(client.get_token(), None)
+        self.assertIsNone(client.get_token())

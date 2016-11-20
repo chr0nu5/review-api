@@ -16,8 +16,15 @@ def after_save_client(sender, instance, **kwargs):
 # Create your models here.
 class Client(User):
     token = models.CharField(max_length=100, null=True, blank=True, unique=True)
+    created_date = models.DateTimeField(auto_now_add=True, editable=False)
+    modified_date = models.DateTimeField(auto_now=True, editable=False)
+
     def __unicode__(self):
         return self.first_name
+
+    class Meta:
+        verbose_name = "Client"
+        verbose_name_plural = "Clients"
 
     def generate_token(self):
         self.token = str(uuid.uuid4())
