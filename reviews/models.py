@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.db.models import Avg
 from django.core.exceptions import ValidationError
+from oauth.models import Client
 
 def validate_rating(value):
     if value < 0 or value > 5:
@@ -13,7 +14,6 @@ def validate_summary(value):
     if len(value) > 10000:
         raise ValidationError('Invalid summary')
 
-# Create your models here.
 class Company(models.Model):
     name = models.CharField(max_length=255)
     created_date = models.DateTimeField(auto_now_add=True, editable=False)
@@ -30,10 +30,10 @@ class Company(models.Model):
     def get_rating(self):
         return Review.objects.filter(company=self).aggregate(Avg('rating'))['rating__avg']
 
-# Create your models here.
 class Reviewer(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField()
+    client = models.ForeignKey(Client)
     created_date = models.DateTimeField(auto_now_add=True, editable=False)
     modified_date = models.DateTimeField(auto_now=True, editable=False)
 

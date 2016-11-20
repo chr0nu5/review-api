@@ -5,7 +5,6 @@ from reviews.models import Review
 
 from django.core.exceptions import ValidationError
 
-# Create your tests here.
 class CompanyTestCase(TestCase):
     def setUp(self):
         company = Company.objects.create(name="apple")
