@@ -2,6 +2,16 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.db.models import Avg
+from django.core.exceptions import ValidationError
+
+def validate_rating(value):
+    if value < 0 or value > 5:
+        raise ValidationError('Invalid rating')
+
+def validate_summary(value):
+    print len(value)
+    if len(value) > 10000:
+        raise ValidationError('Invalid summary')
 
 # Create your models here.
 class Company(models.Model):
@@ -36,9 +46,9 @@ class Reviewer(models.Model):
         ordering = ['-pk']
 
 class Review(models.Model):
-    rating = models.IntegerField()
+    rating = models.IntegerField(validators=[validate_rating])
     title = models.CharField(max_length=64)
-    summary = models.TextField(max_length=10000)
+    summary = models.TextField(max_length=10000, validators=[validate_summary])
     ip = models.CharField(max_length=15)
     company = models.ForeignKey(Company)
     reviewer = models.ForeignKey(Reviewer)
