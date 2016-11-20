@@ -1,9 +1,18 @@
 from __future__ import unicode_literals
 
+import re
+import unidecode
+
 from django.db import models
 from django.db.models import Avg
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
+
 from oauth.models import Client
+
+def slugify(text):
+    text = unidecode.unidecode(text).lower()
+    return re.sub(r'\W+', '-', text)
 
 def validate_rating(value):
     try:
@@ -32,7 +41,12 @@ class Company(models.Model):
         ordering = ['-pk']
 
     def get_rating(self):
-        return Review.objects.filter(company=self).aggregate(Avg('rating'))['rating__avg']
+        key = "rating_%s_%s" % (str(self.pk), self.name)
+        return cache.get(key)
+
+    def update_average_rating(self):
+        rating = Review.objects.filter(company=self).aggregate(Avg('rating'))['rating__avg']
+        cache.set("rating_%s_%s" % (str(self.pk), self.name), rating)
 
 class Reviewer(models.Model):
     name = models.CharField(max_length=255)

@@ -7,9 +7,15 @@ web:
     - "8000:8000"
   links:
     - db
+    - redis
+
 db:
   image: postgres
   volumes_from:
     - pg_data
+
+redis:
+  image: redis
+
 pg_data:
   image: pg_data

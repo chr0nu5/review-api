@@ -130,6 +130,8 @@ def reviews(request):
                     print str(error)
                     return JsonResponse({"error": str(error)})
 
+                company.update_average_rating()
+
                 return JsonResponse({"review": {
                         "id": review.pk,
                         "rating": review.rating,
