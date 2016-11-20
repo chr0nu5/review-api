@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.db.models import Avg
 
 # Create your models here.
 class Company(models.Model):
@@ -15,6 +16,9 @@ class Company(models.Model):
         verbose_name = "Company"
         verbose_name_plural = "Companies"
         ordering = ['-pk']
+
+    def get_rating(self):
+        return Review.objects.filter(company=self).aggregate(Avg('rating'))['rating__avg']
 
 # Create your models here.
 class Reviewer(models.Model):
