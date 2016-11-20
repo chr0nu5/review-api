@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import uuid
+
 from django.db import models
 from django.db.models import signals
 from django.contrib.auth.models import User
@@ -16,5 +18,14 @@ class Client(User):
     token = models.CharField(max_length=100, null=True, blank=True, unique=True)
     def __unicode__(self):
         return self.first_name
+
+    def generate_token(self):
+        self.token = str(uuid.uuid4())
+
+    def invalidate_token(self):
+        self.token = None
+
+    def get_token(self):
+        return self.token
 
 signals.post_save.connect(after_save_client, sender=Client)
