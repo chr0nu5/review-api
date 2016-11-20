@@ -6,7 +6,11 @@ from django.core.exceptions import ValidationError
 from oauth.models import Client
 
 def validate_rating(value):
-    if value < 0 or value > 5:
+    try:
+        value = int(value)
+        if value < 0 or value > 5:
+            raise ValidationError('Invalid rating')
+    except ValueError:
         raise ValidationError('Invalid rating')
 
 def validate_summary(value):
