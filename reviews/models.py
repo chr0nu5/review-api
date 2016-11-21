@@ -10,9 +10,11 @@ from django.core.exceptions import ValidationError
 
 from oauth.models import Client
 
+
 def slugify(text):
     text = unidecode.unidecode(text).lower()
     return re.sub(r'\W+', '-', text)
+
 
 def validate_rating(value):
     try:
@@ -22,10 +24,12 @@ def validate_rating(value):
     except ValueError:
         raise ValidationError('Invalid rating')
 
+
 def validate_summary(value):
     print len(value)
     if len(value) > 10000:
         raise ValidationError('Invalid summary')
+
 
 class Company(models.Model):
     name = models.CharField(max_length=255)
@@ -48,6 +52,7 @@ class Company(models.Model):
         rating = Review.objects.filter(company=self).aggregate(Avg('rating'))['rating__avg']
         cache.set("rating_%s_%s" % (str(self.pk), self.name), rating)
 
+
 class Reviewer(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField()
@@ -62,6 +67,7 @@ class Reviewer(models.Model):
         verbose_name = "Reviewer"
         verbose_name_plural = "Reviewers"
         ordering = ['-pk']
+
 
 class Review(models.Model):
     rating = models.IntegerField(validators=[validate_rating])

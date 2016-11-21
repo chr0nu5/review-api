@@ -1,36 +1,35 @@
 from django.contrib.auth import authenticate
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from .models import Client
+from .serializers import ClientSerializer
 
-@csrf_exempt
+
+@api_view(['POST'])
 def token(request):
-    if request.method == 'POST':
-        username = request.POST.get("username", "")
-        password = request.POST.get("password", "")
-        if username and password:
-            user = authenticate(username = username, password = password)
-            if user is not None:
-                client = Client.objects.get(username=user.username)
+    client = ClientSerializer(data=request.data)
+    if client.is_valid():
+        user = authenticate(username=request.data.get('username'), password=request.data.get('password'))
+        if user is not None:
+            client = Client.objects.get(username=user.username)
+            if client.token is None:
                 client.generate_token()
                 client.save()
-                return JsonResponse({'token': client.get_token()})
-            return JsonResponse({'error': 'Invalid username or password'})
-        return JsonResponse({'error': 'Username and password required'})
-    return JsonResponse({'error': 'Http method not allowed'})
+            return Response({"token": client.token}, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    return Response({"error": client.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-@csrf_exempt
+
+@api_view(['POST'])
 def invalidate_token(request):
-    if request.method == 'POST':
-        username = request.POST.get("username", "")
-        password = request.POST.get("password", "")
-        if username and password:
-            user = authenticate(username = username, password = password)
-            if user is not None:
-                client = Client.objects.get(username=user.username)
-                client.invalidate_token()
-                client.save()
-                return JsonResponse({'msg': 'User token has been invalidated'})
-            return JsonResponse({'error': 'Invalid username or password'})
-        return JsonResponse({'error': 'Username and password required'})
-    return JsonResponse({'error': 'Http method not allowed'})
+    client = ClientSerializer(data=request.data)
+    if client.is_valid():
+        user = authenticate(username=request.data.get('username'), password=request.data.get('password'))
+        if user is not None:
+            client = Client.objects.get(username=user.username)
+            client.invalidate_token()
+            client.save()
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    return Response({"error": client.errors}, status=status.HTTP_400_BAD_REQUEST)

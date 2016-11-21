@@ -6,8 +6,8 @@ from oauth.models import Client
 from reviews.models import Company
 from reviews.models import Reviewer
 from reviews.models import Review
-from django.views.decorators.csrf import csrf_exempt
 from utils import get_ip
+
 
 # get a list of companies
 def companies(request):
@@ -23,6 +23,7 @@ def companies(request):
         return JsonResponse({"error": "A valid token is needed for this request."})
     return JsonResponse({'error': 'Http method not allowed'})
 
+
 # get a list of reviewers or add a new reviewer
 @csrf_exempt
 def reviewers(request):
@@ -35,8 +36,8 @@ def reviewers(request):
                 reviewers = [{"id": r.pk, "name": r.name} for r in reviewers]
                 return JsonResponse({"reviewers": reviewers})
             elif request.method == 'POST':
-                name = request.POST.get('name','')
-                email = request.POST.get('email','')
+                name = request.POST.get('name', '')
+                email = request.POST.get('email', '')
                 if name and email:
                     match = re.search(r'[\w.-]+@[\w.-]+.\w+', email)
                     if match:
@@ -54,6 +55,7 @@ def reviewers(request):
                 return JsonResponse({'error': 'Http method not allowed'})
         return JsonResponse({"error": "A valid token is needed for this request."})
     return JsonResponse({"error": "A valid token is needed for this request."})
+
 
 # get a list of reviews or add a new review
 @csrf_exempt
@@ -88,9 +90,9 @@ def reviews(request):
                 summary = request.POST.get('summary', '')
                 ip = get_ip(request)
                 company = request.POST.get('company_id', '')
-                #company = Company.objects.filter(pk=company).first()
+                # company = Company.objects.filter(pk=company).first()
                 reviewer = request.POST.get('reviewer_id', '')
-                #reviewer = Reviewer.objects.filter(pk=reviewer).first()
+                # reviewer = Reviewer.objects.filter(pk=reviewer).first()
 
                 try:
                     rating = int(rating)
@@ -103,7 +105,7 @@ def reviews(request):
                     return JsonResponse({'error': 'You must provide a title'})
 
                 if len(summary) == 0 or len(summary) > 10000:
-                    return JsonResponse({'error': 'You must provide a `summary` and it cannot have more than 10.000 characters'})
+                    return JsonResponse({'error': 'You must provide a `summary` with more than 10.000 characters'})
 
                 if not ip:
                     return JsonResponse({'error': 'You must be hiding from me'})
@@ -122,7 +124,15 @@ def reviews(request):
                     if reviewer is None:
                         return JsonResponse({'error': 'Provided `reviewer_id` does not exists'})
 
-                review = Review(rating=rating, title=title, summary=summary, ip=ip, company=company, reviewer=reviewer, client=client)
+                review = Review(
+                    rating=rating,
+                    title=title,
+                    summary=summary,
+                    ip=ip,
+                    company=company,
+                    reviewer=reviewer,
+                    client=client
+                )
                 try:
                     review.clean_fields()
                     review.save()

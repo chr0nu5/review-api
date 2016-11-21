@@ -7,12 +7,14 @@ from oauth.models import Client
 
 from django.core.exceptions import ValidationError
 
+
 class CompanyTestCase(TestCase):
     def setUp(self):
         company = Company.objects.create(name="test_apple_test")
         cache.set("rating_%s_test_apple_test" % str(company.pk), None)
         client = Client.objects.create(username='test', password='password', token='token')
-        reviewer = Reviewer.objects.create(name="john",client=client)
+        reviewer = Reviewer(name="john", client=client)
+        reviewer.save()
 
     def test_company_rating_none(self):
         """The company does not have rating"""
@@ -24,17 +26,43 @@ class CompanyTestCase(TestCase):
         company = Company.objects.get(name="test_apple_test")
         reviewer = Reviewer.objects.get(name="john")
         client = Client.objects.get(username='test')
-        review = Review.objects.create(rating=5, title="review", summary="review text", ip="127.0.0.1", company=company, reviewer=reviewer, client=client)
+        review = Review(
+            rating=5,
+            title="review",
+            summary="review text",
+            ip="127.0.0.1",
+            company=company,
+            reviewer=reviewer,
+            client=client
+        )
+        review.save()
         company.update_average_rating()
         self.assertEqual(company.get_rating(), 5)
 
-    def test_company_rating_five(self):
+    def test_company_rating_two_point_five(self):
         """The company rating should be two point five"""
         company = Company.objects.get(name="test_apple_test")
         reviewer = Reviewer.objects.get(name="john")
         client = Client.objects.get(username='test')
-        review = Review.objects.create(rating=5, title="review", summary="review text", ip="127.0.0.1", company=company, reviewer=reviewer, client=client)
-        review = Review.objects.create(rating=0, title="review", summary="review text", ip="127.0.0.1", company=company, reviewer=reviewer, client=client)
+        review = Review.objects.create(
+            rating=5,
+            title="review",
+            summary="review text",
+            ip="127.0.0.1",
+            company=company,
+            reviewer=reviewer,
+            client=client
+        )
+        review = Review(
+            rating=0,
+            title="review",
+            summary="review text",
+            ip="127.0.0.1",
+            company=company,
+            reviewer=reviewer,
+            client=client
+        )
+        review.save()
         company.update_average_rating()
         self.assertEqual(company.get_rating(), 2.5)
 
@@ -43,7 +71,15 @@ class CompanyTestCase(TestCase):
         company = Company.objects.get(name="test_apple_test")
         reviewer = Reviewer.objects.get(name="john")
         client = Client.objects.get(username='test')
-        review = Review.objects.create(rating=6, title="review", summary="review text", ip="127.0.0.1", company=company, reviewer=reviewer, client=client)
+        review = Review.objects.create(
+            rating=6,
+            title="review",
+            summary="review text",
+            ip="127.0.0.1",
+            company=company,
+            reviewer=reviewer,
+            client=client
+        )
         company.update_average_rating()
         self.assertRaises(ValidationError, review.clean_fields)
 
@@ -53,6 +89,14 @@ class CompanyTestCase(TestCase):
         reviewer = Reviewer.objects.get(name="john")
         client = Client.objects.get(username='test')
         s = ''.join([str(i) for i in range(10005) if i])
-        review = Review.objects.create(rating=5, title="review", summary=s, ip="127.0.0.1", company=company, reviewer=reviewer, client=client)
+        review = Review.objects.create(
+            rating=5,
+            title="review",
+            summary=s,
+            ip="127.0.0.1",
+            company=company,
+            reviewer=reviewer,
+            client=client
+        )
         company.update_average_rating()
         self.assertRaises(ValidationError, review.clean_fields)

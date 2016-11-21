@@ -1,11 +1,12 @@
 from django.test import TestCase
 from oauth.models import Client
 
+
 # Create your tests here.
 class ClientTestCase(TestCase):
     def setUp(self):
         client = Client(username="john", password="john")
-        #client.generate_token()
+        # client.generate_token()
         client.save()
 
     def test_client_null_token(self):
