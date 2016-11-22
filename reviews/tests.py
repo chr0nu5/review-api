@@ -54,7 +54,7 @@ class CompanyTestCase(TestCase):
             client=client
         )
         review = Review(
-            rating=0,
+            rating=1,
             title="review",
             summary="review text",
             ip="127.0.0.1",
@@ -64,10 +64,10 @@ class CompanyTestCase(TestCase):
         )
         review.save()
         company.update_average_rating()
-        self.assertEqual(company.get_rating(), 2.5)
+        self.assertEqual(company.get_rating(), 3)
 
     def test_rating_invalid(self):
-        """The rating should be between 0 and 5"""
+        """The rating should be between 1 and 5"""
         company = Company.objects.get(name="test_apple_test")
         reviewer = Reviewer.objects.get(name="john")
         client = Client.objects.get(username='test')
@@ -80,7 +80,6 @@ class CompanyTestCase(TestCase):
             reviewer=reviewer,
             client=client
         )
-        company.update_average_rating()
         self.assertRaises(ValidationError, review.clean_fields)
 
     def test_rating_summary_invalid(self):
@@ -98,5 +97,4 @@ class CompanyTestCase(TestCase):
             reviewer=reviewer,
             client=client
         )
-        company.update_average_rating()
         self.assertRaises(ValidationError, review.clean_fields)

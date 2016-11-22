@@ -19,10 +19,10 @@ def slugify(text):
 def validate_rating(value):
     try:
         value = int(value)
-        if value < 0 or value > 5:
-            raise ValidationError('Invalid rating')
+        if value < 1 or value > 5:
+            raise ValidationError('Rating should be between 1 and 5')
     except ValueError:
-        raise ValidationError('Invalid rating')
+        raise ValidationError('Rating should be a valid integer')
 
 
 def validate_summary(value):
